@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#14213d">
+<title>LensLearn</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #14213d;
+    --ink-soft: #4a5472;
+    --paper: #fbf6ec;
+    --card: #ffffff;
+    --line: #e7dfcc;
+    --gold: #fca311;
+    --gold-deep: #d98500;
+    --green: #2a9d8f;
+    --red: #c8553d;
+    --radius: 18px;
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    font-family: "Inter", system-ui, sans-serif;
+    color: var(--ink);
+    background:
+      radial-gradient(900px 400px at 85% -10%, #ffe7b8 0%, transparent 60%),
+      radial-gradient(700px 380px at -10% 10%, #d7efe9 0%, transparent 55%),
+      var(--paper);
+    min-height: 100vh;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 20px 16px 48px; }
+
+  header { display: flex; align-items: center; gap: 12px; margin: 6px 0 18px; }
+  .logo {
+    width: 44px; height: 44px; border-radius: 14px; background: var(--ink);
+    display: grid; place-items: center; flex: none;
+    box-shadow: 0 6px 0 -2px var(--gold);
+  }
+  .logo svg { width: 26px; height: 26px; }
+  h1 { font-family: "Fraunces", serif; font-weight: 800; font-size: 28px; margin: 0; letter-spacing: -0.5px; }
+  .tag { color: var(--ink-soft); font-size: 14px; margin: 2px 0 0; }
+
+  .card {
+    background: var(--card); border: 1.5px solid var(--line); border-radius: var(--radius);
+    padding: 16px; margin-bottom: 14px;
+  }
+  .label { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); margin: 0 0 10px; }
+
+  /* photo area */
+  .drop {
+    border: 2px dashed #d3c8ac; border-radius: 14px; background: #fffdf7;
+    min-height: 190px; display: grid; place-items: center; text-align: center;
+    padding: 14px; position: relative; overflow: hidden;
+  }
+  .drop.has-img { border-style: solid; border-color: var(--gold); padding: 0; }
+  .drop img { width: 100%; max-height: 360px; object-fit: contain; display: none; background: #111; }
+  .drop.has-img img { display: block; }
+  .drop.has-img .placeholder { display: none; }
+  .placeholder p { margin: 8px 0 0; color: var(--ink-soft); font-size: 14px; }
+  .placeholder svg { width: 40px; height: 40px; color: var(--gold-deep); }
+  .btn-row { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+  .btn {
+    appearance: none; border: 0; cursor: pointer; font: inherit; font-weight: 600;
+    padding: 12px 16px; border-radius: 12px; display: inline-flex; align-items: center; gap: 8px;
+    background: var(--ink); color: #fff; min-height: 46px;
+  }
+  .btn.alt { background: #fff; color: var(--ink); border: 1.5px solid var(--line); }
+  .btn.go { background: var(--gold); color: var(--ink); box-shadow: 0 4px 0 var(--gold-deep); width: 100%; justify-content: center; font-size: 16px; }
+  .btn.go:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--gold-deep); }
+  .btn[disabled] { opacity: .55; cursor: not-allowed; }
+  .btn.small { min-height: 38px; padding: 8px 12px; font-size: 13px; }
+
+  /* modes */
+  .modes { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  @media (min-width: 560px) { .modes { grid-template-columns: repeat(4, 1fr); } }
+  .mode input { position: absolute; opacity: 0; pointer-events: none; }
+  .mode span {
+    display: block; text-align: center; padding: 12px 6px; border-radius: 12px; cursor: pointer;
+    border: 1.5px solid var(--line); background: #fff; font-weight: 600; font-size: 14px;
+  }
+  .mode small { display: block; font-weight: 400; color: var(--ink-soft); font-size: 11.5px; margin-top: 2px; }
+  .mode input:checked + span { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .mode input:checked + span small { color: #cfd6ee; }
+  .mode input:focus-visible + span { outline: 3px solid var(--gold); outline-offset: 2px; }
+
+  select, textarea {
+    width: 100%; font: inherit; color: var(--ink); background: #fff;
+    border: 1.5px solid var(--line); border-radius: 12px; padding: 12px;
+  }
+  textarea { resize: vertical; min-height: 56px; }
+  .two { display: grid; gap: 12px; }
+  @media (min-width: 560px) { .two { grid-template-columns: 1fr 2fr; } }
+
+  /* conversation */
+  .msg { border-radius: 14px; padding: 12px 14px; margin-bottom: 10px; line-height: 1.55; font-size: 15.5px; }
+  .msg.user { background: #fff3d6; border: 1.5px solid #f3dca2; }
+  .msg.model { background: #fff; border: 1.5px solid var(--line); }
+  .msg.error { background: #fdecea; border: 1.5px solid #f2c0b6; color: #8a2f1d; }
+  .msg .who { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 4px; }
+  .msg p { margin: 0 0 8px; } .msg p:last-child { margin: 0; }
+  .msg ul, .msg ol { margin: 4px 0 8px; padding-left: 22px; }
+  .msg h3, .msg h4 { font-family: "Fraunces", serif; margin: 10px 0 4px; }
+  .loading { display: flex; align-items: center; gap: 10px; color: var(--ink-soft); }
+  .dots span { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--gold); margin-right: 4px; animation: b 1s infinite ease-in-out; }
+  .dots span:nth-child(2) { animation-delay: .15s; } .dots span:nth-child(3) { animation-delay: .3s; }
+  @keyframes b { 0%, 80%, 100% { transform: translateY(0); opacity: .5; } 40% { transform: translateY(-6px); opacity: 1; } }
+
+  .followup { display: flex; gap: 8px; align-items: flex-end; }
+  .followup textarea { min-height: 48px; }
+  footer { text-align: center; color: var(--ink-soft); font-size: 12.5px; margin-top: 20px; line-height: 1.5; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#fca311" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/><path d="M8.5 11h5M11 8.5v5" stroke="#fff"/></svg>
+    </div>
+    <div>
+      <h1>LensLearn</h1>
+      <p class="tag">Snap it. Ask it. Understand it. Powered by Gemma 4.</p>
+    </div>
+  </header>
+
+  <section class="card">
+    <p class="label">1 · Add a photo</p>
+    <div class="drop" id="drop">
+      <img id="preview" alt="Your photo preview">
+      <div class="placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.5-2h7L17 8h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+        <p>A textbook page, a plant, a circuit, a receipt, a sign&hellip;</p>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn" id="btnCamera" type="button">Take photo</button>
+      <button class="btn alt" id="btnUpload" type="button">Upload image</button>
+      <button class="btn alt" id="btnClear" type="button" hidden>Remove</button>
+    </div>
+    <input class="sr" id="fileCamera" type="file" accept="image/*" capture="environment">
+    <input class="sr" id="fileUpload" type="file" accept="image/*">
+  </section>
+
+  <section class="card">
+    <p class="label">2 · What do you need?</p>
+    <div class="modes" role="radiogroup" aria-label="Mode">
+      <label class="mode"><input type="radio" name="mode" value="explain" checked><span>Explain<small>what is this?</small></span></label>
+      <label class="mode"><input type="radio" name="mode" value="study"><span>Study<small>notes + quiz</small></span></label>
+      <label class="mode"><input type="radio" name="mode" value="steps"><span>Fix it<small>step by step</small></span></label>
+      <label class="mode"><input type="radio" name="mode" value="check"><span>Check<small>look closer</small></span></label>
+    </div>
+    <div class="two" style="margin-top:14px">
+      <div>
+        <p class="label">Language</p>
+        <select id="language">
+          <option>English</option>
+          <option>Twi (Akan)</option>
+          <option>Ga</option>
+          <option>Ewe</option>
+          <option>Hausa</option>
+          <option>Dagbani</option>
+          <option>French</option>
+          <option>Spanish</option>
+          <option>Portuguese</option>
+          <option>Arabic</option>
+          <option>Swahili</option>
+        </select>
+      </div>
+      <div>
+        <p class="label">Your question (optional)</p>
+        <textarea id="question" placeholder="e.g. Why are the leaves turning yellow?"></textarea>
+      </div>
+    </div>
+    <div style="margin-top:14px">
+      <button class="btn go" id="btnAsk" type="button">Ask Gemma 4</button>
+    </div>
+  </section>
+
+  <section id="chat" hidden>
+    <p class="label" style="margin-left:4px">Conversation</p>
+    <div id="log"></div>
+    <div class="card" id="followCard" hidden>
+      <div class="followup">
+        <textarea id="follow" placeholder="Ask a follow-up&hellip;" rows="1"></textarea>
+        <button class="btn small" id="btnFollow" type="button">Send</button>
+      </div>
+      <div class="btn-row">
+        <button class="btn alt small" id="btnNew" type="button">Start over</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Open source (MIT). AI can make mistakes: for health, safety, or money decisions,<br>
+    check with a qualified person.
+  </footer>
+</div>
+
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  let file = null;          // current image (File)
+  let history = [];         // [{role:'user'|'model', text}]
+  let busy = false;
+
+  // ---------- photo handling ----------
+  const setFile = (f) => {
+    if (!f) return;
+    file = f;
+    $('preview').src = URL.createObjectURL(f);
+    $('drop').classList.add('has-img');
+    $('btnClear').hidden = false;
+  };
+  const clearFile = () => {
+    file = null;
+    $('preview').removeAttribute('src');
+    $('drop').classList.remove('has-img');
+    $('btnClear').hidden = true;
+    $('fileCamera').value = ''; $('fileUpload').value = '';
+  };
+  $('btnCamera').onclick = () => $('fileCamera').click();
+  $('btnUpload').onclick = () => $('fileUpload').click();
+  $('btnClear').onclick = clearFile;
+  $('fileCamera').onchange = (e) => setFile(e.target.files[0]);
+  $('fileUpload').onchange = (e) => setFile(e.target.files[0]);
+
+  // ---------- tiny safe markdown ----------
+  const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const inline = (s) => esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/(^|[^*])\*(?!\s)(.+?)\*/g, '$1<em>$2</em>').replace(/`(.+?)`/g, '<code>$1</code>');
+  function md(text) {
+    const lines = text.split(/\r?\n/);
+    let html = '', list = null;
+    const close = () => { if (list) { html += `</${list}>`; list = null; } };
+    for (const raw of lines) {
+      const line = raw.trimEnd();
+      let m;
+      if ((m = line.match(/^\s*[-*•]\s+(.*)/))) {
+        if (list !== 'ul') { close(); html += '<ul>'; list = 'ul'; }
+        html += `<li>${inline(m[1])}</li>`;
+      } else if ((m = line.match(/^\s*\d+[.)]\s+(.*)/))) {
+        if (list !== 'ol') { close(); html += '<ol>'; list = 'ol'; }
+        html += `<li>${inline(m[1])}</li>`;
+      } else if ((m = line.match(/^#{1,4}\s+(.*)/))) {
+        close(); html += `<h4>${inline(m[1])}</h4>`;
+      } else if (line.trim() === '') {
+        close();
+      } else {
+        close(); html += `<p>${inline(line)}</p>`;
+      }
+    }
+    close();
+    return html;
+  }
+
+  // ---------- chat ----------
+  function addMsg(kind, html, who) {
+    const d = document.createElement('div');
+    d.className = `msg ${kind}`;
+    d.innerHTML = (who ? `<div class="who">${who}</div>` : '') + html;
+    $('log').appendChild(d);
+    d.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    return d;
+  }
+
+  async function send(question) {
+    if (busy) return;
+    if (!file && !question && history.length === 0) {
+      addMsg('error', '<p>Add a photo or type a question first.</p>');
+      $('chat').hidden = false;
+      return;
+    }
+    busy = true;
+    ['btnAsk', 'btnFollow'].forEach((id) => $(id).disabled = true);
+    $('chat').hidden = false;
+
+    if (question) addMsg('user', `<p>${esc(question)}</p>`, 'You');
+    else if (history.length === 0) addMsg('user', '<p>(photo)</p>', 'You');
+    const wait = addMsg('model', '<div class="loading"><span class="dots"><span></span><span></span><span></span></span>Gemma 4 is looking…</div>');
+
+    const fd = new FormData();
+    if (file) fd.append('image', file);
+    fd.append('question', question);
+    fd.append('mode', document.querySelector('input[name=mode]:checked').value);
+    fd.append('language', $('language').value);
+    fd.append('history', JSON.stringify(history));
+
+    try {
+      const res = await fetch('/api/ask', { method: 'POST', body: fd });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || 'Something went wrong.');
+      wait.innerHTML = '<div class="who">Gemma 4</div>' + md(data.answer);
+      history.push({ role: 'user', text: question || 'Please help me with this image.' });
+      history.push({ role: 'model', text: data.answer });
+      $('followCard').hidden = false;
+    } catch (err) {
+      wait.className = 'msg error';
+      wait.innerHTML = `<p>${esc(err.message === 'Failed to fetch' ? 'Network problem. Check your connection and try again.' : err.message)}</p>`;
+    } finally {
+      busy = false;
+      ['btnAsk', 'btnFollow'].forEach((id) => $(id).disabled = false);
+    }
+  }
+
+  $('btnAsk').onclick = () => {
+    const q = $('question').value.trim();
+    history = [];                 // a fresh ask starts a fresh conversation
+    $('log').innerHTML = '';
+    send(q);
+  };
+  $('btnFollow').onclick = () => {
+    const q = $('follow').value.trim();
+    if (!q) return;
+    $('follow').value = '';
+    send(q);
+  };
+  $('follow').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $('btnFollow').click(); }
+  });
+  $('btnNew').onclick = () => {
+    history = []; $('log').innerHTML = ''; $('chat').hidden = true; $('followCard').hidden = true;
+    $('question').value = ''; clearFile();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+})();
+</script>
+</body>
+  </html>
+            
